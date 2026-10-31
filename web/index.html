@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#121212">
+  <meta name="description" content="Explore audio trends, correlations, and popular tracks from a cleaned 1922–2020 Spotify songs dataset.">
+  <title>Spotify Songs Analysis Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css?v=spotify-executive-13">
+  <script src="script.js?v=spotify-executive-5" defer></script>
+</head>
+<body class="min-h-screen overflow-y-auto md:h-screen md:overflow-hidden md:flex md:flex-col">
+  <div class="min-h-screen md:flex md:h-screen md:min-h-0 md:flex-col md:overflow-hidden">
+    <header class="hero relative overflow-hidden border-b border-white/5">
+      <div class="hero-glow hero-glow--right" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--left" aria-hidden="true"></div>
+      <div class="hero-inner relative w-full px-5 pb-9 pt-5 sm:px-8 sm:pb-11 sm:pt-7">
+        <nav class="hero-nav mb-10 flex items-center justify-between" aria-label="Main navigation">
+          <a href="./" class="hero-brand flex items-center gap-2.5 text-sm font-bold tracking-wide text-white" aria-label="Spotify Songs Analysis home">
+            <img src="../pics/spotify-logo-green.png" alt="Spotify" width="32" height="32" class="h-8 w-8 object-contain" fetchpriority="high">
+            <h1 class="hero-title font-bold leading-tight tracking-tight text-white">
+              Spotify Songs <span class="text-[#1DB954]">Analysis</span> <span class="hero-years text-white/65">(1922–2020)</span>
+            </h1>
+          </a>
+          <div class="hero-actions">
+            <p class="hero-byline">Created by <strong>Mikhail Jonathan</strong></p>
+          </div>
+        </nav>
+
+        <div class="hero-copy max-w-3xl">
+          <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-[#1DB954]/25 bg-[#1DB954]/10 px-3 py-1.5 text-[11px] font-semibold tracking-[0.15em] text-[#67e590]">
+            <span class="h-1.5 w-1.5 rounded-full bg-[#1DB954]"></span>
+            DATA ANALYTICS PORTFOLIO
+          </p>
+          <p class="hero-description mt-4 max-w-2xl text-sm leading-6 text-[#b3b3b3] sm:text-base">
+            Explore audio trends and popularity across 580K+ cleaned track records released from 1922 to 2020.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-layout flex min-h-screen w-full flex-col gap-7 px-3 py-7 sm:px-4 sm:py-9 md:min-h-0 md:flex-1 md:overflow-hidden xl:px-5">
+      <aside class="dashboard-card dashboard-section dashboard-filters" aria-labelledby="filters-heading">
+        <div class="filter-heading">
+          <div>
+            <p class="eyebrow">Data controls</p>
+            <h2 id="filters-heading" class="section-title">Filters</h2>
+          </div>
+          <span class="filter-live-dot" aria-hidden="true"></span>
+        </div>
+        <form id="dashboard-filters" class="filter-form">
+          <fieldset class="filter-group">
+            <legend>Decade range</legend>
+            <label for="filter-decade-start">From</label>
+            <select id="filter-decade-start" name="decadeStart" disabled>
+              <option value="">Loading...</option>
+            </select>
+            <label for="filter-decade-end">To</label>
+            <select id="filter-decade-end" name="decadeEnd" disabled>
+              <option value="">Loading...</option>
+            </select>
+          </fieldset>
+          <fieldset class="filter-group">
+            <legend>Artist genre</legend>
+            <label class="sr-only" for="filter-genre">Select a genre</label>
+            <select id="filter-genre" name="genre" disabled>
+              <option value="">All genres</option>
+            </select>
+          </fieldset>
+          <fieldset class="filter-group">
+            <legend>Musical key</legend>
+            <label class="sr-only" for="filter-key">Select a musical key</label>
+            <select id="filter-key" name="key" disabled>
+              <option value="">All keys</option>
+            </select>
+          </fieldset>
+          <button id="reset-filters" class="reset-filters" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-3.5 w-3.5" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset filters
+          </button>
+          <p id="filter-summary" class="filter-summary" role="status" aria-live="polite">Preparing filters...</p>
+          <p class="filter-note">Genre and key filters apply to the Top Tracks sample. Unfiltered decade aggregates represent all 1922–2020 records.</p>
+        </form>
+
+        <section class="dashboard-section dashboard-insights sidebar-insights" aria-labelledby="insights-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Data highlights</p>
+              <h2 id="insights-heading" class="section-title">Key insights</h2>
+            </div>
+          </div>
+          <div class="insights-grid grid gap-3">
+            <article class="dashboard-card insight-card">
+              <span class="insight-index">01</span>
+              <p class="insight-label">Largest energy increase</p>
+              <p id="insight-energy" class="insight-value">Loading insight...</p>
+              <p id="insight-energy-detail" class="insight-detail">Comparing average energy across consecutive decades.</p>
+            </article>
+            <article class="dashboard-card insight-card">
+              <span class="insight-index">02</span>
+              <p class="insight-label">Strongest popularity correlation</p>
+              <p id="insight-correlation" class="insight-value">Loading insight...</p>
+              <p id="insight-correlation-detail" class="insight-detail">Finding the strongest absolute value in the correlation data.</p>
+            </article>
+            <article class="dashboard-card insight-card">
+              <span class="insight-index">03</span>
+              <p class="insight-label">Tracks in sample</p>
+              <p id="insight-total" class="insight-value">Loading insight...</p>
+              <p id="insight-total-detail" class="insight-detail">Records selected from the Top Tracks sample.</p>
+            </article>
+          </div>
+        </section>
+      </aside>
+
+      <div class="dashboard-content">
+      <section class="dashboard-section dashboard-overview" aria-labelledby="overview-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Dataset overview</p>
+            <h2 id="overview-heading" class="section-title">At a glance</h2>
+          </div>
+          <span id="data-status" class="status-text" role="status" aria-live="polite">
+            <span class="status-dot status-dot--loading"></span>
+            Loading data...
+          </span>
+        </div>
+
+        <div class="kpi-grid grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+          <article class="dashboard-card kpi-card kpi-card--featured">
+            <p class="kpi-label">Tracks in full dataset</p>
+            <p id="kpi-total-tracks" class="kpi-value"><span class="skeleton">—</span></p>
+            <p class="kpi-note">Cleaned records · 1922–2020</p>
+          </article>
+          <article class="dashboard-card kpi-card">
+            <p class="kpi-label">Selected decades</p>
+            <p id="kpi-year-range" class="kpi-value"><span class="skeleton">—</span></p>
+            <p class="kpi-note">1920s–2020s filters · analysis data: 1922–2020</p>
+          </article>
+          <article class="dashboard-card kpi-card">
+            <p class="kpi-label">Average popularity</p>
+            <p id="kpi-popularity" class="kpi-value"><span class="skeleton">—</span></p>
+            <p class="kpi-note">Top Tracks sample · scale 0–100</p>
+          </article>
+          <article class="dashboard-card kpi-card">
+            <p class="kpi-label">Average danceability</p>
+            <p id="kpi-danceability" class="kpi-value"><span class="skeleton">—</span></p>
+            <p class="kpi-note">Top Tracks sample · scale 0–1</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="dashboard-section dashboard-charts" aria-labelledby="charts-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Patterns &amp; relationships</p>
+            <h2 id="charts-heading" class="section-title">Audio exploration</h2>
+          </div>
+        </div>
+        <div class="charts-grid grid gap-4">
+          <article class="dashboard-card chart-card chart-card--trend">
+            <div class="card-heading">
+              <div>
+                <h3 class="card-title">Audio feature trends by decade</h3>
+                <p id="decade-caption" class="card-description">Average danceability, energy, valence, and acousticness</p>
+              </div>
+              <span class="chart-badge">SKALA 0–1</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="decade-chart" role="img" aria-label="Average audio feature trends by decade chart"></canvas>
+              <div id="decade-loading" class="chart-state">Loading decade trends...</div>
+            </div>
+            <p id="decade-error" class="error-message" role="alert" hidden></p>
+          </article>
+
+          <article class="dashboard-card chart-card chart-card--popularity">
+            <div class="card-heading">
+              <div>
+                <h3 class="card-title">Top 5 decades by popularity</h3>
+                <p id="decade-popularity-caption" class="card-description">Average track popularity by decade</p>
+              </div>
+              <span class="chart-badge">TOP 5</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="decade-popularity-chart" role="img" aria-label="Top five decades by average popularity chart"></canvas>
+              <div id="decade-popularity-loading" class="chart-state">Loading decade popularity...</div>
+            </div>
+            <p id="decade-popularity-error" class="error-message" role="alert" hidden></p>
+          </article>
+
+          <article class="dashboard-card chart-card chart-card--correlation">
+            <div class="card-heading">
+              <div>
+                <h3 class="card-title">Correlation with popularity</h3>
+                <p id="correlation-caption" class="card-description">Pearson correlation of each audio feature with popularity</p>
+              </div>
+              <span class="chart-badge">−1 TO +1</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="correlation-chart" role="img" aria-label="Audio feature correlation with popularity chart"></canvas>
+              <div id="correlation-loading" class="chart-state">Loading correlations...</div>
+            </div>
+            <p id="correlation-error" class="error-message" role="alert" hidden></p>
+          </article>
+
+          <article class="dashboard-card chart-card chart-card--energy">
+            <div class="card-heading">
+              <div>
+                <h3 class="card-title">Energy distribution</h3>
+                <p id="energy-distribution-caption" class="card-description">Distribution of filtered Top Tracks</p>
+              </div>
+              <span class="chart-badge">ENERGY 0–1</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="energy-distribution-chart" role="img" aria-label="Energy distribution histogram for filtered tracks"></canvas>
+              <div id="energy-distribution-loading" class="chart-state">Loading energy distribution...</div>
+            </div>
+            <p id="energy-distribution-error" class="error-message" role="alert" hidden></p>
+          </article>
+
+          <article class="dashboard-card chart-card chart-card--artists">
+            <div class="card-heading">
+              <div>
+                <h3 class="card-title">Top 10 artists by track count</h3>
+                <p id="artist-chart-caption" class="card-description">Full tracks dataset</p>
+              </div>
+              <span class="chart-badge">TOP 10</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="top-artists-chart" role="img" aria-label="Top ten artists by track count chart"></canvas>
+              <div id="top-artists-loading" class="chart-state">Loading top artists...</div>
+            </div>
+            <p id="top-artists-error" class="error-message" role="alert" hidden></p>
+          </article>
+
+          <article class="dashboard-card chart-card chart-card--scatter">
+            <div class="card-heading">
+              <div>
+                <h3 class="card-title">Energy vs Danceability</h3>
+                <p id="scatter-caption" class="card-description">Each point represents one Top Tracks song</p>
+              </div>
+              <span class="chart-badge">SCATTER</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="audio-scatter-chart" role="img" aria-label="Energy versus danceability scatter plot for filtered tracks"></canvas>
+              <div id="audio-scatter-loading" class="chart-state">Loading scatter plot...</div>
+            </div>
+            <p id="audio-scatter-error" class="error-message" role="alert" hidden></p>
+          </article>
+
+          <article class="dashboard-card chart-card chart-card--mode">
+            <div class="card-heading">
+              <div>
+                <h3 class="card-title">Musical mode</h3>
+                <p id="mode-chart-caption" class="card-description">Major vs Minor · full dataset</p>
+              </div>
+              <span class="chart-badge">MAJOR / MINOR</span>
+            </div>
+            <div class="chart-wrap chart-wrap--donut">
+              <canvas id="mode-chart" role="img" aria-label="Major and minor track distribution doughnut chart"></canvas>
+              <div id="mode-chart-loading" class="chart-state">Loading musical modes...</div>
+            </div>
+            <p id="mode-chart-error" class="error-message" role="alert" hidden></p>
+          </article>
+        </div>
+      </section>
+
+      <section class="dashboard-section dashboard-tracks" aria-labelledby="tracks-heading">
+        <div class="section-heading section-heading--tracks">
+          <div>
+            <p class="eyebrow">Dataset selection</p>
+            <h2 id="tracks-heading" class="section-title">Top Tracks</h2>
+            <p class="mt-1 text-xs text-[#777]">Top 100 records by popularity · search and pagination run in your browser.</p>
+          </div>
+          <label class="search-box">
+            <span class="sr-only">Search track or artist name</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4 text-[#777]" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="track-search" type="search" placeholder="Search tracks or artists..." autocomplete="off" disabled>
+          </label>
+        </div>
+
+        <div class="dashboard-card table-card">
+          <div class="table-scroll">
+            <table class="track-table">
+              <thead>
+                <tr>
+                  <th scope="col" class="rank-column">#</th>
+                  <th scope="col">Track</th>
+                  <th scope="col">Artist</th>
+                  <th scope="col">Year</th>
+                  <th scope="col">Key</th>
+                  <th scope="col">Genres</th>
+                  <th scope="col" class="numeric-cell">Popularity</th>
+                  <th scope="col" class="numeric-cell">Danceability</th>
+                  <th scope="col" class="numeric-cell">Energy</th>
+                </tr>
+              </thead>
+              <tbody id="tracks-body">
+                <tr><td colspan="9" class="table-state">Loading tracks...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <p id="table-summary" role="status" aria-live="polite">Loading data...</p>
+            <div class="pagination">
+              <button id="previous-page" type="button" disabled>Previous</button>
+              <span id="page-indicator">— / —</span>
+              <button id="next-page" type="button" disabled>Next</button>
+            </div>
+          </div>
+          <p id="tracks-error" class="error-message table-error" role="alert" hidden></p>
+        </div>
+      </section>
+
+      <footer class="page-footer dashboard-footer">
+        <p>Spotify Songs Analysis <span aria-hidden="true">·</span> Independent data portfolio by Mikhail Jonathan</p>
+        <p class="disclaimer">This project is not affiliated with, sponsored, or officially endorsed by Spotify.</p>
+        <button id="open-dataset-notes" class="dataset-notes-trigger" type="button" aria-haspopup="dialog" aria-controls="dataset-notes">
+          Data, method &amp; limitations
+        </button>
+      </footer>
+      </div>
+    </main>
+    <dialog id="dataset-notes" class="dataset-dialog" aria-labelledby="dataset-notes-title">
+      <div class="dataset-dialog-heading">
+        <div>
+          <p class="eyebrow">Project documentation</p>
+          <h2 id="dataset-notes-title" class="section-title">Data, method &amp; limitations</h2>
+        </div>
+        <button id="close-dataset-notes" class="dataset-dialog-close" type="button" aria-label="Close data notes">×</button>
+      </div>
+      <div class="dataset-dialog-content">
+        <section>
+          <h3>Data scope</h3>
+          <p id="dataset-coverage-note">The dashboard analyzes cleaned track records released from 1922 through 2020. The exact record count is shown in the first KPI.</p>
+          <p>The Top Tracks table and genre/key filters use a sample of up to 100 records ranked by popularity within this date range. Sample averages are labeled separately from full-dataset aggregates.</p>
+        </section>
+        <section>
+          <h3>Method</h3>
+          <p>Records without a track name or a parseable release year are excluded. Analysis is limited to 1922–2020. Audio features and popularity are averaged by release decade; artist counts are based on track records.</p>
+          <p>Popularity is a dataset snapshot, not historical popularity at the time of release. Correlation describes association and does not establish causation.</p>
+        </section>
+        <section>
+          <h3>Source &amp; attribution</h3>
+          <p>Dataset: <a href="https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks" target="_blank" rel="noopener noreferrer">Spotify Dataset 1921–2020, 600k+ Tracks</a> by Yamac Eren Ay. The Kaggle page identifies Spotify Web API as the data source and lists the <a href="https://cdla.dev/sharing-1-0/" target="_blank" rel="noopener noreferrer">Community Data License Agreement — Sharing, Version 1.0</a>. Source files used here: <code>data/raw/tracks.csv</code> and <code>data/raw/artists.csv</code>.</p>
+          <p>The dataset license is not an endorsement by Spotify and does not grant rights to Spotify's trademarks or imply that Spotify independently licensed or verified this portfolio. Review the dataset license and applicable Spotify terms before redistribution.</p>
+          <p>Project code and documentation are MIT-licensed. Third-party dataset rights are not covered by that license; see <code>NOTICE.md</code>.</p>
+        </section>
+      </div>
+    </dialog>
+  </div>
+</body>
+</html>
