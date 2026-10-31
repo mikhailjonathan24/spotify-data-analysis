@@ -1,6 +1,6 @@
 "use strict";
 
-const DATA_PATH = "../data/processed/";
+const DATA_PATH = "data/processed/";
 const DATA_VERSION = "spotify-executive-5";
 const PAGE_SIZE = 10;
 
